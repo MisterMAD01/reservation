@@ -21,7 +21,7 @@ export default function CustomerFlow() {
     const [liffProfile, setLiffProfile] = useState<{ displayName: string; pictureUrl?: string } | null>(null);
 
     useEffect(() => {
-        liff.init({ liffId: '2009265694-bIehje5A' })
+        liff.init({ liffId: '2009265694-KSR25Q34' })
             .then(() => {
                 if (!liff.isLoggedIn()) {
                     liff.login();
