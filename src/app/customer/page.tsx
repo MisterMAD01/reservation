@@ -218,12 +218,12 @@ export default function CustomerFlow() {
                                 {selection.serviceId === 'v2' ? 'Select Pitch' : 'Select Stylist'}
                             </h2>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 pb-28">
                                 {resources.filter((r: Resource) => r.type === (selection.serviceId === 'v2' ? 'field' : 'staff')).map((r: Resource) => (
                                     <motion.button
                                         whileHover={{ y: -5 }} whileTap={{ scale: 0.95 }}
                                         key={r.id}
-                                        onClick={() => { setSelection({ ...selection, staffId: r.id }); setStep(3); }}
+                                        onClick={() => setSelection({ ...selection, staffId: r.id })}
                                         className={`bank-card p-6 flex flex-col items-center gap-4 border transition-all duration-500
                                             ${selection.staffId === r.id ? 'border-emerald-500 bg-emerald-500/5' : 'border-white/5 opacity-60 hover:opacity-100'}`}
                                     >
@@ -238,6 +238,22 @@ export default function CustomerFlow() {
                                     </motion.button>
                                 ))}
                             </div>
+
+                            <AnimatePresence>
+                                {selection.staffId && (
+                                    <motion.div
+                                        initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
+                                        className="fixed bottom-28 left-0 w-full px-6 z-[60]"
+                                    >
+                                        <button
+                                            onClick={() => setStep(3)}
+                                            className="w-full py-5 bg-emerald-500 text-black font-black text-xs uppercase rounded-2xl shadow-[0_20px_40px_rgba(16,185,129,0.3)] active:scale-95 transition-all"
+                                        >
+                                            ดำเนินการต่อ (Continue)
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
                     )}
 
@@ -279,20 +295,41 @@ export default function CustomerFlow() {
                             </div>
 
                             {/* Time Slots */}
-                            <div className="mt-8 space-y-2">
-                                {timeSlots.map((slot, i) => (
-                                    <button
-                                        key={i}
-                                        disabled={slot.status === 'จองแล้ว'}
-                                        onClick={() => handleBooking(slot.time)}
-                                        className={`w-full p-4 rounded-xl border text-sm font-bold flex justify-between items-center transition-all active:scale-[0.98]
-                      ${slot.status === 'จองแล้ว' ? 'bg-[#1a1a1a] border-white/5 text-slate-600 opacity-50' : 'bg-[#1a1a1a] border-white/10 text-white hover:border-emerald-500'}`}
-                                    >
-                                        <span>{slot.time} น.</span>
-                                        <span className={`text-[10px] font-black uppercase ${slot.status === 'ว่าง' ? 'text-emerald-500' : 'text-slate-500'}`}>{slot.status}</span>
-                                    </button>
-                                ))}
+                            <div className="mt-8 space-y-2 pb-40">
+                                {timeSlots.map((slot, i) => {
+                                    const isSelectedTime = selection.time === slot.time;
+                                    return (
+                                        <button
+                                            key={i}
+                                            disabled={slot.status === 'จองแล้ว'}
+                                            onClick={() => setSelection({ ...selection, time: slot.time })}
+                                            className={`w-full p-4 rounded-xl border text-sm font-bold flex justify-between items-center transition-all active:scale-[0.98]
+                                                ${slot.status === 'จองแล้ว' ? 'bg-[#1a1a1a] border-white/5 text-slate-600 opacity-30 shadow-none' :
+                                                    isSelectedTime ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-lg shadow-emerald-500/10' :
+                                                        'bg-[#1a1a1a] border-white/10 text-white hover:border-emerald-500/50'}`}
+                                        >
+                                            <span>{slot.time} น.</span>
+                                            <span className={`text-[10px] font-black uppercase ${slot.status === 'ว่าง' ? 'text-emerald-500' : 'text-slate-500'}`}>{slot.status}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
+
+                            <AnimatePresence>
+                                {selection.time && (
+                                    <motion.div
+                                        initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
+                                        className="fixed bottom-28 left-0 w-full px-6 z-[60]"
+                                    >
+                                        <button
+                                            onClick={() => handleBooking(selection.time!)}
+                                            className="w-full py-5 bg-emerald-500 text-black font-black text-xs uppercase rounded-2xl shadow-[0_20px_40px_rgba(16,185,129,0.3)] active:scale-95 transition-all"
+                                        >
+                                            ยืนยันการจอง (Confirm Booking)
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
                     )}
 
