@@ -241,11 +241,11 @@ export default function CustomerFlow() {
                                 </div>
                                 <div className="grid grid-cols-7 gap-1">
                                     {daysInMonth.map((day, idx) => {
-                                        const isSelected = isSameDay(day, selection.date || new Date(0));
+                                        const isSelected = !!selection.date && isSameDay(day, new Date(selection.date));
                                         return (
                                             <button
                                                 key={idx}
-                                                onClick={() => setSelection({ ...selection, date: day })}
+                                                onClick={() => setSelection({ ...selection, date: format(day, 'yyyy-MM-dd') })}
                                                 className={`aspect-square flex items-center justify-center text-xs font-bold rounded-full transition-all
                            ${isSelected ? 'bg-black text-white shadow-xl' : 'hover:bg-black/5 text-slate-800'}`}
                                             >
