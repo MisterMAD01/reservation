@@ -23,7 +23,9 @@ export default function CustomerFlow() {
     useEffect(() => {
         liff.init({ liffId: '2009265694-bIehje5A' })
             .then(() => {
-                if (liff.isLoggedIn()) {
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
                     liff.getProfile().then(profile => {
                         setLiffProfile(profile);
                     });
