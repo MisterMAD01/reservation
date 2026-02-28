@@ -1,5 +1,7 @@
 'use client';
 
+import liff from '@line/liff';
+
 import { useQueue, Booking, Resource, Service } from '@/app/context/QueueContext';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +18,19 @@ export default function CustomerFlow() {
     const [step, setStep] = useState<number | string>(1);
     const [selection, setSelection] = useState<Partial<Booking>>({});
     const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [liffProfile, setLiffProfile] = useState<{ displayName: string; pictureUrl?: string } | null>(null);
+
+    useEffect(() => {
+        liff.init({ liffId: '2009265694-bIehje5A' })
+            .then(() => {
+                if (liff.isLoggedIn()) {
+                    liff.getProfile().then(profile => {
+                        setLiffProfile(profile);
+                    });
+                }
+            })
+            .catch((err) => console.error('LIFF Init Error:', err));
+    }, []);
 
     // My active booking
     const [myBooking, setMyBooking] = useState<Booking | null>(null);
@@ -52,10 +67,10 @@ export default function CustomerFlow() {
 
     const handleBooking = (time: string) => {
         const freshBooking = addBooking({
-            customerName: 'คุณสุชิน',
-            staffId: selection.staffId || 'any', // Use 'any' if no staff selected (e.g., for stadium booking)
+            customerName: liffProfile?.displayName || 'Guest User',
+            staffId: selection.staffId || 'any',
             serviceId: selection.serviceId!,
-            date: format(selection.date || new Date(), 'yyyy-MM-dd'),
+            date: format(selection.date ? new Date(selection.date) : new Date(), 'yyyy-MM-dd'),
             time,
         });
         sessionStorage.setItem('active_booking_id', freshBooking.id);
@@ -87,11 +102,16 @@ export default function CustomerFlow() {
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                     )}
-                    <div className="flex flex-col">
-                        <h1 className="text-sm font-bold text-white">ร้านตัดผม นราธิวาส</h1>
-                        <span className="text-[10px] text-emerald-500 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
-                        </span>
+                    <div className="flex items-center gap-3">
+                        {liffProfile?.pictureUrl && (
+                            <img src={liffProfile.pictureUrl} className="w-8 h-8 rounded-full border border-white/20" alt="" />
+                        )}
+                        <div className="flex flex-col">
+                            <h1 className="text-sm font-bold text-white">{liffProfile?.displayName || 'Mistermad Queue'}</h1>
+                            <span className="text-[10px] text-emerald-500 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-4 text-slate-400">
